@@ -34,7 +34,7 @@
 #if defined(CONFIG_ARDUINO_I2C_AVAILABLE) && \
     defined(CONFIG_ARDUINO_I2C_ENABLE)
 
-#include <Wire.h>
+#include "micro_wire/micro_wire.hpp"
 
 static uint8_t s_bytesWritten = 0;
 static uint8_t s_sa = 0x3C;
@@ -68,18 +68,15 @@ static void ssd1306_i2cSendByte_Wire(uint8_t data)
 #elif defined(USI_BUF_SIZE)
     if (s_bytesWritten >= (USI_BUF_SIZE -2))
 #else
-    if ( Wire.write(data) != 0 )
-    {
-        s_bytesWritten++;
-        return;
-    }
+    Wire.write(data);
+    s_bytesWritten++;
+    return;
 #endif
-    {
-        ssd1306_i2cStop_Wire();
-        ssd1306_i2cStart_Wire();
-        ssd1306_i2cSendByte_Wire(0x40);
-        /* Commands never require many bytes. Thus assume that user tries to send data */
-    }
+    ssd1306_i2cStop_Wire();
+    ssd1306_i2cStart_Wire();
+    ssd1306_i2cSendByte_Wire(0x40);
+    /* Commands never require many bytes. Thus assume that user tries to send data */
+
     Wire.write(data);
     s_bytesWritten++;
 }
@@ -91,10 +88,6 @@ static void ssd1306_i2cSendBytes_Wire(const uint8_t *buffer, uint16_t size)
         ssd1306_i2cSendByte_Wire(*buffer);
         buffer++;
     }
-}
-
-static void ssd1306_i2cClose_Wire()
-{
 }
 
 void ssd1306_platform_i2cInit(int8_t busId, uint8_t addr, ssd1306_platform_i2cConfig_t * cfg)
@@ -119,7 +112,6 @@ void ssd1306_platform_i2cInit(int8_t busId, uint8_t addr, ssd1306_platform_i2cCo
     ssd1306_intf.stop = ssd1306_i2cStop_Wire;
     ssd1306_intf.send = ssd1306_i2cSendByte_Wire;
     ssd1306_intf.send_buffer = ssd1306_i2cSendBytes_Wire;
-    ssd1306_intf.close = ssd1306_i2cClose_Wire;
 }
 
 #endif // CONFIG_ARDUINO_I2C_AVAILABLE

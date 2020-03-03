@@ -11,3 +11,4 @@ This directory contain platform specific implementation of hardware abstraction 
 
 Edit UserSettings.h header file, if you want to disable some parts of ssd1306 library to reduce memory consumption in your project
   
+UPD: replace heavy Wire.h on micro_wire.hpp

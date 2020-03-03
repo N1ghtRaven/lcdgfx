@@ -263,7 +263,7 @@ void NanoDisplayOps1<I>::printFixedN(lcdint_t xpos, lcdint_t y, const char *ch, 
         {
             x = xpos;
             y++;
-            if (y >= (this->m_h >> 3))
+            if (y >= (uint8_t)(this->m_h >> 3))
             {
                 break;
             }

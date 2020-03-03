@@ -32,7 +32,7 @@
 
 #if defined(CONFIG_ARDUINO_I2C_AVAILABLE) && defined(CONFIG_ARDUINO_I2C_ENABLE)
 
-#include <Wire.h>
+#include "micro_wire/micro_wire.hpp"
 
 static uint8_t s_bytesWritten = 0;
 
@@ -94,18 +94,15 @@ void ArduinoI2c::send(uint8_t data)
 #elif defined(USI_BUF_SIZE)
     if (s_bytesWritten >= (USI_BUF_SIZE -2))
 #else
-    if ( Wire.write(data) != 0 )
-    {
-        s_bytesWritten++;
-        return;
-    }
+    Wire.write(data);
+    s_bytesWritten++;
+    return;
 #endif
-    {
-        stop();
-        start();
-        send( m_mode );
-        /* Commands never require many bytes. Thus assume that user tries to send data */
-    }
+    stop();
+    start();
+    send( m_mode );
+    /* Commands never require many bytes. Thus assume that user tries to send data */
+
     Wire.write(data);
     s_bytesWritten++;
 }
